@@ -144,7 +144,7 @@ Um sistema desktop dividido em módulos, desenvolvido em etapas:
 ## 📁 Estrutura de pastas
 
 ```
-PROJETO-POO-UNDB---LUIS-ANTONIO-LUCIANO-VICTOR/
+PROJETO-POO-UNDB---LUIS-ANTONIO-LUCIANO-VICTOR-MATEUS-DANTAS/
 ├── docs/                          # Documentação do projeto
 │   ├── diagramas/                 # Diagrama de classes (+ classes de apoio) e casos de uso
 │   ├── interface/telas.md         # O que cada tela faz e quais regras aplica
@@ -199,8 +199,8 @@ Tem que aparecer `21` na versão.
 ### 2. Baixar o projeto
 
 ```powershell
-git clone https://github.com/lluisneto/PROJETO-POO-UNDB---LUIS-ANTONIO-LUCIANO-VICTOR.git
-cd PROJETO-POO-UNDB---LUIS-ANTONIO-LUCIANO-VICTOR
+git clone https://github.com/lluisneto/PROJETO-POO-UNDB---LUIS-ANTONIO-LUCIANO-VICTOR-MATEUS-DANTAS.git
+cd PROJETO-POO-UNDB---LUIS-ANTONIO-LUCIANO-VICTOR-MATEUS-DANTAS
 ```
 
 ### 3. Abrir o sistema
@@ -279,6 +279,7 @@ Usamos mensagens de commit curtas e padronizadas:
 |------|--------|
 | Luis Antonio Arruda Neto | [@lluisneto](https://github.com/lluisneto) |
 | Luciano Victor Costa de Carvalho |  |
+| Mateus Augusto Dantas Dias |  |
 
 ---
 
