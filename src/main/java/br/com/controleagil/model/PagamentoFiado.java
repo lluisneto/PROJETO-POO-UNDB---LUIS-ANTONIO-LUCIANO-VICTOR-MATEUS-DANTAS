@@ -31,6 +31,9 @@ public class PagamentoFiado extends Pagamento {
     @Override
     public void processar(Pedido pedido) {
         Cliente cliente = pedido.getCliente();
+        if (!cliente.isIdentificado()) {
+            throw new RegraNegocioException("O cliente sem identificação não compra fiado. Escolha outra forma de pagamento.");
+        }
         if (!cliente.temContaFiado()) {
             throw new RegraNegocioException("O cliente " + cliente.getNome()
                     + " não tem conta fiado. Abra a conta na tela Clientes.");
