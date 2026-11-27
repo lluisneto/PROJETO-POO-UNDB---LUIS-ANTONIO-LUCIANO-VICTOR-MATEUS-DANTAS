@@ -23,7 +23,13 @@ classDiagram
         -ContaFiado contaFiado
         +abrirContaFiado(BigDecimal limite) void
         +temContaFiado() boolean
+        +isIdentificado() boolean
         +getContaFiado() ContaFiado
+    }
+
+    class ClienteSemIdentificacao {
+        +abrirContaFiado(BigDecimal limite) void
+        +isIdentificado() boolean
     }
 
     class ContaFiado {
@@ -135,6 +141,7 @@ classDiagram
     }
 
     Pessoa <|-- Cliente
+    Cliente <|-- ClienteSemIdentificacao
     Cliente "1" *-- "0..1" ContaFiado : possui
     ContaFiado "1" *-- "0..*" MovimentacaoFiado : registra
     MovimentacaoFiado "0..*" --> "0..1" Pedido : originada por
@@ -174,6 +181,7 @@ Toda regra quebrada lança `RegraNegocioException`, com mensagem em português.
 | RC10 | Dinheiro: valor recebido precisa cobrir o pagamento | `PagamentoDinheiro.processar` |
 | RC11 | Pix: código da transação opcional; se vier, precisa ter formato válido | `PagamentoPix.processar` |
 | RC18 | Cartão: precisa dizer se foi débito ou crédito | `PagamentoCartao.processar` |
+| RC19 | Pedido sem cliente cadastrado vai para o cliente sem identificação, que não compra fiado nem é editado | `ClienteSemIdentificacao` (sobrescreve `abrirContaFiado` e `isIdentificado`), `ClienteService`, `PagamentoFiado.processar` |
 | RC12 | Pedido novo não pode ter entrega no passado | `PedidoService.registrarPedido` |
 | – | Pedidos atrasados também aparecem no alerta de entrega próxima | `Pedido.estaProximoDaEntrega` |
 

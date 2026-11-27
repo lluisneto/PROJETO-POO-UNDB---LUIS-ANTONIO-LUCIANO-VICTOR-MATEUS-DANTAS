@@ -2,12 +2,14 @@ package br.com.controleagil.service;
 
 import br.com.controleagil.exception.RegraNegocioException;
 import br.com.controleagil.model.Cliente;
+import br.com.controleagil.model.ClienteSemIdentificacao;
 import br.com.controleagil.repository.ClienteRepository;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 /*
  * Responsabilidade: os casos de uso de clientes: cadastrar, editar, buscar e abrir conta fiado.
@@ -27,9 +29,25 @@ public class ClienteService {
         this.repositorio = repositorio;
     }
 
-    /** Todos os clientes, em ordem alfabética. */
+    /**
+     * Todos os clientes: primeiro o "Cliente sem identificação" (o mais usado no balcão), depois os
+     * cadastrados em ordem alfabética.
+     */
     public List<Cliente> listarTodos() {
-        return repositorio.listarTodos();
+        List<Cliente> todos = repositorio.listarTodos();
+        return Stream.concat(todos.stream().filter(cliente -> !cliente.isIdentificado()),
+                todos.stream().filter(Cliente::isIdentificado)).toList();
+    }
+
+    /**
+     * Garante que existe o cliente das vendas sem cadastro (cria na primeira vez) e devolve ele.
+     * Chamado sempre que o sistema abre: rodar de novo não cria outro.
+     */
+    public Cliente garantirClienteSemIdentificacao() {
+        return repositorio.listarTodos().stream()
+                .filter(cliente -> !cliente.isIdentificado())
+                .findFirst()
+                .orElseGet(() -> repositorio.salvar(new ClienteSemIdentificacao()));
     }
 
     /**
@@ -54,8 +72,11 @@ public class ClienteService {
         return repositorio.salvar(new Cliente(nome, telefone, endereco));
     }
 
-    /** Atualiza os dados de um cliente já cadastrado. */
+    /** Atualiza os dados de um cliente já cadastrado. O cliente sem identificação não é editado. */
     public Cliente atualizar(Cliente cliente, String nome, String telefone, String endereco) {
+        if (!cliente.isIdentificado()) {
+            throw new RegraNegocioException("O cliente sem identificação não pode ser editado: ele serve para as vendas sem cadastro.");
+        }
         cliente.alterarNome(nome); // valida primeiro o que pode dar erro, antes de mudar o resto
         cliente.alterarTelefone(telefone);
         cliente.alterarEndereco(endereco);
@@ -64,7 +85,7 @@ public class ClienteService {
 
     /** Abre a conta fiado do cliente com o limite informado (zero ou mais). */
     public void abrirContaFiado(Cliente cliente, BigDecimal limite) {
-        cliente.abrirContaFiado(limite);
+        cliente.abrirContaFiado(limite); // o ClienteSemIdentificacao recusa aqui (RC19)
         repositorio.salvar(cliente);
     }
 

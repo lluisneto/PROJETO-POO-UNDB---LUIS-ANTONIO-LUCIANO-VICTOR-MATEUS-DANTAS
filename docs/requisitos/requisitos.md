@@ -91,6 +91,7 @@ elas estão aqui (veja a coluna "Antes").
 | RC16 | Cancelar um pedido pago no fiado estorna a compra da conta do cliente (até o valor da dívida; o que o cliente já pagou é devolvido por fora) | `Pedido.alterarStatus()`, `PagamentoFiado.cancelar()`, `ContaFiado.registrarEstorno()` | – |
 | RC17 | O limite do fiado pode ser alterado; com um limite menor que a dívida, a conta aparece acima do limite e cada nova compra fiado gera o aviso da RN03 | `ContaFiado.alterarLimite()` | – |
 | RC18 | No cartão, é preciso dizer se foi **débito** ou **crédito** (a aprovação acontece na maquininha, fora do sistema) | `PagamentoCartao.processar()` | – |
+| RC19 | Dá para anotar um pedido sem cliente cadastrado: ele vai para o **Cliente sem identificação**, que vem primeiro na lista, não compra fiado e não pode ser editado | `ClienteSemIdentificacao`, `ClienteService.garantirClienteSemIdentificacao()`, `PagamentoFiado.processar()` | – |
 
 ## Requisitos não funcionais (RNF)
 

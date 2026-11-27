@@ -56,6 +56,8 @@ public class AppContexto {
         fiadoService = new FiadoService(clientes);
         this.mensagemInicial = mensagemInicial;
 
+        // O "Cliente sem identificação" existe sempre (vendas sem cadastro), até no banco vazio.
+        clienteService.garantirClienteSemIdentificacao();
         if (carregarExemplos) {
             DadosExemplo.carregar(clienteService, produtoService, pedidoService, fiadoService, relogio);
         }

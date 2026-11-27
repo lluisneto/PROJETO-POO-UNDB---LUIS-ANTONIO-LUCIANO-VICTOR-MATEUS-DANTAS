@@ -2,6 +2,7 @@ package br.com.controleagil.repository.sqlite;
 
 import br.com.controleagil.exception.RepositorioException;
 import br.com.controleagil.model.Cliente;
+import br.com.controleagil.model.ClienteSemIdentificacao;
 import br.com.controleagil.model.ContaFiado;
 import br.com.controleagil.model.ItemPedido;
 import br.com.controleagil.model.MovimentacaoFiado;
@@ -310,6 +311,37 @@ class RepositorioSqliteTest {
         new PedidoService(repositorios.pedidos(), RELOGIO).registrarPagamento(pedido,
                 new PagamentoCartao(reais("12.00"), TipoCartao.CREDITO));
         assertValor("20.00", reabrir().pedidos().buscarPorId(1).orElseThrow().calcularValorPago());
+    }
+
+    @Test
+    @DisplayName("O cliente sem identificação volta do banco como ele mesmo (e não é criado de novo)")
+    void clienteSemIdentificacaoVoltaIgual() {
+        Cliente avulso = new ClienteService(reabrir().clientes()).garantirClienteSemIdentificacao();
+
+        ClienteService depois = new ClienteService(reabrir().clientes());
+        Cliente lido = depois.listarTodos().get(0);
+        assertInstanceOf(ClienteSemIdentificacao.class, lido);
+        assertEquals(avulso.getId(), lido.getId());
+        assertSame(lido, depois.garantirClienteSemIdentificacao());
+        assertEquals(1, depois.listarTodos().size());
+    }
+
+    @Test
+    @DisplayName("Migração: banco sem a coluna sem_identificacao ganha a coluna e os clientes continuam lá")
+    void migraBancoSemClienteSemIdentificacao() throws Exception {
+        // Banco da versão antiga: a tabela cliente ainda não tinha a coluna nova.
+        executar("CREATE TABLE cliente (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT NOT NULL,"
+                + " telefone TEXT, endereco TEXT, limite_fiado TEXT)");
+        executar("INSERT INTO cliente (nome, limite_fiado) VALUES ('Maria', '50.00')");
+
+        ClienteService clientes = new ClienteService(reabrir().clientes()); // aqui acontece a migração
+        Cliente maria = clientes.listarTodos().get(0);
+        assertTrue(maria.isIdentificado());
+        assertTrue(maria.temContaFiado());
+        clientes.garantirClienteSemIdentificacao();
+
+        assertEquals(List.of("Cliente sem identificação", "Maria"),
+                new ClienteService(reabrir().clientes()).listarTodos().stream().map(Cliente::getNome).toList());
     }
 
     private void executar(String sql) throws Exception {

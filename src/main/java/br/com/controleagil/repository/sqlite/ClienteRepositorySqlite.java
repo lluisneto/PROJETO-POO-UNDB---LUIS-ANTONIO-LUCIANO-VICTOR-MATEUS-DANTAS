@@ -1,6 +1,7 @@
 package br.com.controleagil.repository.sqlite;
 
 import br.com.controleagil.model.Cliente;
+import br.com.controleagil.model.ClienteSemIdentificacao;
 import br.com.controleagil.model.MovimentacaoFiado;
 import br.com.controleagil.model.Pedido;
 import br.com.controleagil.model.TipoMovimentacao;
@@ -108,11 +109,14 @@ public class ClienteRepositorySqlite implements ClienteRepository {
     private void carregarClientes() {
         banco.consultar("Não foi possível ler os clientes do banco.", conexao -> {
             try (PreparedStatement sql = conexao.prepareStatement(
-                    "SELECT id, nome, telefone, endereco, limite_fiado FROM cliente ORDER BY id");
+                    "SELECT id, nome, telefone, endereco, limite_fiado, sem_identificacao FROM cliente ORDER BY id");
                  ResultSet linha = sql.executeQuery()) {
                 while (linha.next()) {
-                    Cliente cliente = new Cliente(linha.getString("nome"), linha.getString("telefone"),
-                            linha.getString("endereco"));
+                    // A coluna diz qual classe remontar: o cliente das vendas sem cadastro volta como
+                    // ClienteSemIdentificacao (e continua sem poder comprar fiado).
+                    Cliente cliente = linha.getInt("sem_identificacao") == 1
+                            ? new ClienteSemIdentificacao()
+                            : new Cliente(linha.getString("nome"), linha.getString("telefone"), linha.getString("endereco"));
                     String limite = linha.getString("limite_fiado");
                     if (limite != null) {
                         cliente.abrirContaFiado(new BigDecimal(limite));
@@ -129,8 +133,9 @@ public class ClienteRepositorySqlite implements ClienteRepository {
     private long gravarCliente(Connection conexao, Cliente cliente) throws SQLException {
         if (cliente.getId() == null) {
             try (PreparedStatement sql = conexao.prepareStatement(
-                    "INSERT INTO cliente (nome, telefone, endereco, limite_fiado) VALUES (?, ?, ?, ?)")) {
+                    "INSERT INTO cliente (nome, telefone, endereco, limite_fiado, sem_identificacao) VALUES (?, ?, ?, ?, ?)")) {
                 preencher(sql, cliente);
+                sql.setInt(5, cliente.isIdentificado() ? 0 : 1);
                 sql.executeUpdate();
             }
             return ConexaoBanco.ultimoIdInserido(conexao);

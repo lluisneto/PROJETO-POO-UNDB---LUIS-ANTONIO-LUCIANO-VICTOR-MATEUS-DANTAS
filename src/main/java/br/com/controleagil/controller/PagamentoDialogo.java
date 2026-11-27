@@ -150,7 +150,9 @@ public class PagamentoDialogo {
                     ? ". A dívida já passou do limite em " + Formatador.moeda(conta.getValorAcimaDoLimite()) + "." : ""));
         } else {
             opcaoFiado.setDisable(true);
-            textoFiado.setText("Fiado desligado: este cliente não tem conta fiado (abra na tela Clientes).");
+            textoFiado.setText(cliente.isIdentificado()
+                    ? "Fiado desligado: este cliente não tem conta fiado (abra na tela Clientes)."
+                    : "Fiado desligado: o cliente sem identificação não compra fiado.");
         }
         textoFiado.getStyleClass().add("dica");
     }

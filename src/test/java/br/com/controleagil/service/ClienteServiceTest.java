@@ -11,7 +11,9 @@ import java.util.List;
 
 import static br.com.controleagil.TesteDinheiro.reais;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -63,6 +65,29 @@ class ClienteServiceTest {
         service.abrirContaFiado(joao, reais("150"));
         assertTrue(joao.temContaFiado());
         assertThrows(RegraNegocioException.class, () -> service.abrirContaFiado(joao, reais("200")));
+    }
+
+    @Test
+    @DisplayName("O cliente sem identificação é criado uma vez só e aparece primeiro na lista")
+    void clienteSemIdentificacaoVemPrimeiro() {
+        Cliente avulso = service.garantirClienteSemIdentificacao();
+        assertSame(avulso, service.garantirClienteSemIdentificacao()); // rodar de novo não cria outro
+
+        assertEquals(List.of("Cliente sem identificação", "Ana Lima", "João Pereira"),
+                service.listarTodos().stream().map(Cliente::getNome).toList());
+        assertFalse(avulso.isIdentificado());
+        assertTrue(joao.isIdentificado());
+    }
+
+    @Test
+    @DisplayName("RC19: o cliente sem identificação não abre conta fiado e não é editado")
+    void clienteSemIdentificacaoNaoCompraFiado() {
+        Cliente avulso = service.garantirClienteSemIdentificacao();
+        assertThrows(RegraNegocioException.class, () -> service.abrirContaFiado(avulso, reais("100")));
+        assertFalse(avulso.temContaFiado());
+
+        assertThrows(RegraNegocioException.class, () -> service.atualizar(avulso, "Outro nome", null, null));
+        assertEquals("Cliente sem identificação", avulso.getNome());
     }
 
     @Test

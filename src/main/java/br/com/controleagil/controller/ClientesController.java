@@ -179,7 +179,13 @@ public class ClientesController {
         campoTelefone.setText(editando && cliente.getTelefone() != null ? cliente.getTelefone() : "");
         campoEndereco.setText(editando && cliente.getEndereco() != null ? cliente.getEndereco() : "");
 
-        botaoAbrirFiado.setDisable(!editando);
+        // O "Cliente sem identificação" é fixo: não se edita e não abre conta fiado (RC19).
+        boolean fixo = editando && !cliente.isIdentificado();
+        campoNome.setDisable(fixo);
+        campoTelefone.setDisable(fixo);
+        campoEndereco.setDisable(fixo);
+        botaoSalvar.setDisable(fixo);
+        botaoAbrirFiado.setDisable(!editando || fixo);
         botaoAbrirFiado.setText(editando && cliente.temContaFiado() ? "Alterar limite do fiado" : "Abrir conta fiado");
         textoContaFiado.setText(textoDaConta(cliente));
     }
@@ -187,6 +193,9 @@ public class ClientesController {
     private static String textoDaConta(Cliente cliente) {
         if (cliente == null) {
             return "Selecione um cliente na tabela para abrir a conta fiado.";
+        }
+        if (!cliente.isIdentificado()) {
+            return "Usado nas vendas sem cadastro. Não compra fiado e não pode ser editado.";
         }
         if (!cliente.temContaFiado()) {
             return cliente.getNome() + " ainda não tem conta fiado.";

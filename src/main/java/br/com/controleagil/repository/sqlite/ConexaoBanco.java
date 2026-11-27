@@ -70,17 +70,24 @@ public class ConexaoBanco {
      * MIGRAÇÃO de bancos de versões antigas. O SQLite não deixa mudar uma regra CHECK direto,
      * então a tabela antiga é renomeada, a nova é criada e as linhas são copiadas de volta.
      *  - movimentacao_fiado: antes do estorno, aceitava só 'COMPRA' e 'PAGAMENTO';
-     *  - pagamento: antes do cartão, aceitava só 'DINHEIRO', 'PIX' e 'FIADO'.
+     *  - pagamento: antes do cartão, aceitava só 'DINHEIRO', 'PIX' e 'FIADO';
+     *  - cliente: antes do cliente sem identificação, não tinha a coluna sem_identificacao.
      * Tudo numa transação: se der errado, o banco fica como estava.
      */
     private void atualizarVersaoAntiga(Connection conexao) throws SQLException {
         boolean fiadoAntigo = precisaAtualizar(conexao, "movimentacao_fiado", "ESTORNO");
         boolean pagamentoAntigo = precisaAtualizar(conexao, "pagamento", "CARTAO_DEBITO");
-        if (!fiadoAntigo && !pagamentoAntigo) {
+        boolean clienteAntigo = precisaAtualizar(conexao, "cliente", "sem_identificacao");
+        if (!fiadoAntigo && !pagamentoAntigo && !clienteAntigo) {
             return;
         }
         conexao.setAutoCommit(false);
         try (Statement comando = conexao.createStatement()) {
+            if (clienteAntigo) {
+                // Coluna nova: aqui não precisa recriar a tabela, o SQLite deixa acrescentar a coluna.
+                comando.execute("ALTER TABLE cliente ADD COLUMN sem_identificacao INTEGER NOT NULL DEFAULT 0"
+                        + " CHECK (sem_identificacao IN (0, 1))");
+            }
             if (fiadoAntigo) {
                 recriar(comando, "movimentacao_fiado", "id, cliente_id, tipo, valor, data, pedido_id",
                         "CREATE TABLE movimentacao_fiado ("

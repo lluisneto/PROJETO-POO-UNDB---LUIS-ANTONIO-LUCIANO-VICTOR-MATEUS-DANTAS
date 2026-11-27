@@ -61,15 +61,15 @@ Regras usadas: RN05, RC02, RC03, RC07, RN03 (fiado acima do limite **só avisa**
 
 | Elemento | O que faz |
 |----------|-----------|
-| Cliente | Lista com nome e telefone. |
+| Cliente | Lista com nome e telefone. O primeiro é o **Cliente sem identificação**, que já vem escolhido: dá para anotar uma venda sem cadastrar ninguém. Para vender fiado, troque pelo cliente cadastrado. |
 | Entrega | Dia (padrão: hoje) e hora: lista de 15 em 15 minutos, das 06:00 às 22:00, ou digitada no formato HH:mm (validada). O sistema sugere o próximo horário redondo. |
 | Itens | Produto (com preço) + quantidade + **Adicionar**. Adicionar um produto que já está na lista **soma a quantidade**. Cada linha tem **Remover**. |
 | Total | Em destaque, atualizado na hora. |
-| Pagamento | **Pagar depois** (padrão), **Dinheiro** (valor recebido e troco calculado na hora), **Pix** (código opcional), **Cartão** (escolha **Débito** ou **Crédito**) ou **Fiado** (mostra o crédito disponível e avisa quanto o total passa do limite; ao salvar, pede confirmação; desabilitado, com explicação, se o cliente não tiver conta fiado). |
+| Pagamento | **Pagar depois** (padrão), **Dinheiro** (valor recebido e troco calculado na hora), **Pix** (código opcional), **Cartão** (escolha **Débito** ou **Crédito**) ou **Fiado** (mostra o crédito disponível e avisa quanto o total passa do limite; ao salvar, pede confirmação; desabilitado, com explicação, se o cliente não tiver conta fiado ou for o cliente sem identificação). |
 | Salvar / Limpar | Salvar registra o pedido e mostra o número na mensagem rápida. Erros aparecem logo acima do botão Salvar. |
 | Rascunho guardado | Dá para ir até **Clientes** (cadastrar um cliente novo) ou **Produtos** e voltar: o pedido que estava sendo montado continua lá, e o cliente novo já aparece na lista. Com a lista vazia, o campo diz onde cadastrar. |
 
-Regras usadas: RN01, RN02, RN03 (fiado acima do limite **só avisa** e pede confirmação), RC18, RC06, RC10, RC11, RC12, RF03, RF04, RF08, RF14.
+Regras usadas: RN01, RN02, RN03 (fiado acima do limite **só avisa** e pede confirmação), RC18, RC19, RC06, RC10, RC11, RC12, RF03, RF04, RF08, RF14.
 
 ## Clientes
 
@@ -79,8 +79,9 @@ Regras usadas: RN01, RN02, RN03 (fiado acima do limite **só avisa** e pede conf
 | Tabela | Nome · Telefone · Endereço · Conta fiado (Sim/Não) · Saldo devedor. |
 | Formulário | Clicar num cliente da tabela leva ele para o formulário (edição); o botão **Novo cliente** limpa o formulário (cadastro). Usar a busca no meio da edição não apaga o que já foi digitado. Nome obrigatório. |
 | Abrir conta fiado / Alterar limite | Sem conta: pede o limite e abre a conta. Com conta: o mesmo botão vira **Alterar limite do fiado** (ex.: limite digitado errado, cliente ganhou mais crédito). Limite abaixo da dívida deixa a conta acima do limite: as próximas compras fiado mostram o aviso. |
+| Cliente sem identificação | Aparece em primeiro na tabela. É criado sozinho quando o sistema abre e fica travado: não pode ser editado nem abrir conta fiado. |
 
-Regras usadas: RC14, RC13 (limite ≥ 0), RC15, RF01, RF11.
+Regras usadas: RC14, RC13 (limite ≥ 0), RC15, RC19, RF01, RF11.
 
 ## Produtos
 

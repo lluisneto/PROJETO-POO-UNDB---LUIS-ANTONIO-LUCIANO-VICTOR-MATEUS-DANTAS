@@ -74,6 +74,7 @@ Um sistema desktop dividido em módulos, desenvolvido em etapas:
 
 ### Etapa 1: Pedidos agendados
 - [x] Cadastro de clientes
+- [x] Pedido sem cliente cadastrado ("Cliente sem identificação", sem fiado)
 - [x] Cadastro de produtos (salgados, preços)
 - [x] Registro de pedido com itens, **data e horário de entrega**
 - [x] Controle de status: `PENDENTE` → `EM_PRODUCAO` → `SAIU_PARA_ENTREGA` → `ENTREGUE` / `CANCELADO`
@@ -122,6 +123,7 @@ Um sistema desktop dividido em módulos, desenvolvido em etapas:
 |--------|------------------|
 | `Pessoa` *(abstrata)* | Dados comuns: nome, telefone |
 | `Cliente` | Herda de `Pessoa`; possui endereço e uma `ContaFiado` |
+| `ClienteSemIdentificacao` | Herda de `Cliente`; usado nas vendas sem cadastro, não compra fiado |
 | `Produto` | Salgado vendido: nome e preço |
 | `Pedido` | Cliente, itens, data/hora de entrega e status |
 | `ItemPedido` | Produto + quantidade + subtotal |
@@ -133,7 +135,7 @@ Um sistema desktop dividido em módulos, desenvolvido em etapas:
 ### Conceitos de POO aplicados
 
 - **Encapsulamento:** o saldo da `ContaFiado` é privado e só muda pelos métodos `registrarCompra()`, `registrarPagamento()` e `registrarEstorno()`, que validam os valores (ex.: o pagamento não pode ser maior que a dívida, RN04). O limite (RN03) não bloqueia: a conta diz quanto a compra passaria do limite (`quantoPassariaDoLimite()`) e a tela avisa e pede confirmação.
-- **Herança:** `Cliente` herda de `Pessoa` (e futuramente `Entregador` também).
+- **Herança:** `Cliente` herda de `Pessoa` (e futuramente `Entregador` também); `ClienteSemIdentificacao` herda de `Cliente` e sobrescreve `abrirContaFiado()` para recusar o fiado.
 - **Polimorfismo:** cada tipo de `Pagamento` implementa `processar()` do seu jeito; o `PagamentoFiado`, por exemplo, lança o valor na conta fiado do cliente.
 - **Abstração:** `Pessoa` e `Pagamento` são classes abstratas, representando conceitos gerais.
 

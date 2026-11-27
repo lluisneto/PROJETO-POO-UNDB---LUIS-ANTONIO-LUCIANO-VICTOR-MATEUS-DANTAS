@@ -193,7 +193,9 @@ public class NovoPedidoController implements TelaAtualizavel {
     @FXML
     private void limpar() {
         itens = List.of();
-        campoCliente.setValue(null);
+        // Já vem com o "Cliente sem identificação" (o primeiro da lista): dá para salvar sem escolher
+        // um cliente. Para o fiado, troca-se pelo cliente cadastrado.
+        campoCliente.setValue(campoCliente.getItems().stream().filter(c -> !c.isIdentificado()).findFirst().orElse(null));
         campoProduto.setValue(null);
         campoQuantidade.getValueFactory().setValue(1);
         sugerirDataEHora();
@@ -293,6 +295,8 @@ public class NovoPedidoController implements TelaAtualizavel {
         textoFiado.getStyleClass().remove("aviso-campo");
         if (cliente == null) {
             textoFiado.setText("Escolha o cliente para ver se ele pode comprar fiado.");
+        } else if (!cliente.isIdentificado()) {
+            textoFiado.setText("Fiado desligado: o cliente sem identificação não compra fiado.");
         } else if (!podeFiado) {
             textoFiado.setText("Fiado desligado: " + cliente.getNome() + " não tem conta fiado (abra na tela Clientes).");
         } else {

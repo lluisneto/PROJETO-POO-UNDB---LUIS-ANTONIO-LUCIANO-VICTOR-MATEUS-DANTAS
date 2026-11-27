@@ -10,7 +10,9 @@ CREATE TABLE IF NOT EXISTS cliente (
     nome          TEXT    NOT NULL,
     telefone      TEXT,
     endereco      TEXT,
-    limite_fiado  TEXT                -- NULL quando o cliente não tem conta fiado
+    limite_fiado  TEXT,               -- NULL quando o cliente não tem conta fiado
+    sem_identificacao INTEGER NOT NULL DEFAULT 0
+        CHECK (sem_identificacao IN (0, 1))  -- 1 só no "Cliente sem identificação" (vendas sem cadastro)
 );
 
 CREATE TABLE IF NOT EXISTS produto (
