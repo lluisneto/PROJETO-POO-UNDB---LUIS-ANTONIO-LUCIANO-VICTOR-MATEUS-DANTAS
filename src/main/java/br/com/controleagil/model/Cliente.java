@@ -42,6 +42,14 @@ public class Cliente extends Pessoa {
         return contaFiado != null;
     }
 
+    /**
+     * Diz se é um cliente cadastrado de verdade. Só o ClienteSemIdentificacao responde false
+     * (POLIMORFISMO: a tela pergunta sem saber qual é a classe do cliente).
+     */
+    public boolean isIdentificado() {
+        return true;
+    }
+
     /** A conta fiado do cliente, ou null se ele não tiver (confira antes com temContaFiado()). */
     public ContaFiado getContaFiado() {
         return contaFiado;
