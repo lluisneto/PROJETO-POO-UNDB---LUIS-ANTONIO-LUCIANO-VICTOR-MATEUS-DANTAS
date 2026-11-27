@@ -2,6 +2,7 @@ package br.com.controleagil.service;
 
 import br.com.controleagil.exception.RegraNegocioException;
 import br.com.controleagil.model.Cliente;
+import br.com.controleagil.model.ClienteSemIdentificacao;
 import br.com.controleagil.model.ItemPedido;
 import br.com.controleagil.model.Pagamento;
 import br.com.controleagil.model.PagamentoCartao;
@@ -96,6 +97,22 @@ class PedidoServiceTest {
         assertNotNull(pedido.getId());
         assertValor("15.00", cliente.getContaFiado().getSaldoDevedor());
         assertValor("5.00", cliente.getContaFiado().getValorAcimaDoLimite());
+    }
+
+    @Test
+    @DisplayName("Pedido sem cliente cadastrado vai para o cliente sem identificação, mas não no fiado")
+    void pedidoSemIdentificacao() {
+        Cliente avulso = new ClienteSemIdentificacao();
+        List<ItemPedido> itens = List.of(new ItemPedido(coxinha, 2)); // R$ 10,00
+
+        Pedido pedido = service.registrarPedido(avulso, AGORA.plusHours(1), itens,
+                service.criarPagamento(FormaPagamento.PIX, service.calcularTotal(itens), null, null));
+        assertNotNull(pedido.getId());
+        assertValor("10.00", pedido.calcularValorPago());
+
+        assertThrows(RegraNegocioException.class, () -> service.registrarPedido(avulso, AGORA.plusHours(2), itens,
+                service.criarPagamento(FormaPagamento.FIADO, service.calcularTotal(itens), null, null)));
+        assertEquals(1, service.listarTodos().size());
     }
 
     @Test
